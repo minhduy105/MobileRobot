@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+	<name>exercises1</name>
+	<version>0.0.0</version>
+	<description>Do the exercise 1 for ROB 599 at OSU</description>
+
+	<maintainer email="nguyend6@oregonstate.edu">Duy Nguyen</maintainer>
+
+	<license>BSD</license>
+
+	<author email="nguyend6@oregonstate.edu">Duy Nguyen</author> 
+
+
+	<buildtool_depend>catkin</buildtool_depend>
+
+	<build_depend>rospy</build_depend>
+	<build_depend>math</build_depend>
+	<build_depend>geometry_msgs.msg/Twist</build_depend>
+	<build_depend>sensor_msgs.msg/LaserScan</build_depend>
+
+	<run_depend>rospy</run_depend>
+	<run_depend>math</run_depend>
+	<run_depend>geometry_msgs.msg/Twist</run_depend>
+	<run_depend>sensor_msgs.msg/LaserScan</run_depend>
+
+
+
+</package>

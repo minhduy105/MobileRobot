@@ -1,0 +1,10 @@
+1/ Comments about real and simulated robots:
+
+I think that for the real robot, the sensor data is way more unstable than the simulated robot. The real robot has a longer delay than the simulated robots. Finally, I think that when controlling the real robots, you need to notice about the surrounding environment and the potential physical problems of the robot. For example, the laptop on the top of the turtlebot can easily fall off if you drive it too fast, or when the robot go under the table, its top might get stuck at the table. 
+
+2/ Comments about differences between real and simulated maps:
+
+I think that my simulated map is better than the real world map. I think that one of the reason for it is because I am using a very complex simulated map. Hence, the robot has an easier time to localize itself than the typical simple and clean simulated map. Additionally, because I already have prior knowledge of the simulated map, I can control the robot better and more accurately map the environment. Finally, the simulated map only has solid objects, it is easier to map them. 
+For the real map, there are a lot of space the robot can not get inside to map. Additionally, there is a lot of table in which the scan did not detect but the robot is too tall to go under. Hence, there is some space that look liked the robot can go there, but it actually cannot and will get stuck at the top. 
+
+

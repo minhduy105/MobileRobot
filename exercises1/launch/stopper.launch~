@@ -1,0 +1,9 @@
+<launch>
+	<!-- launch stage_stimulator  -->	
+	<include file="$(find turtlebot_stage)/launch/turtlebot_in_stage.launch" />
+	
+	<!-- launch move node  -->	
+	<node name="move" pkg="exercise1" type="move.py" />
+		<param name="stopDistance" value="0.5" type="double"/>
+		<param name="stopType" value="tanh"/>
+</launch>
