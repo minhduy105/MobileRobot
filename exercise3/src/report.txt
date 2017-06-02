@@ -1,0 +1,3 @@
+I think that the actual path and the simulated path is not always align with each others. The actual path will become more and more off to the simulated path the more you let the robot run. The reason is that the error from the odometry and the motor makes the transformation is not perfectly. The more you run the robot, the more those error accumulate over time. Hence, you need to relocalize after a long run. 
+
+I also run into problem of the turtle bot just drop goal points. I think it could be due to internet connection that make the points can not be transferred correctly. 

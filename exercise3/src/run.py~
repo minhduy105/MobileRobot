@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+import rospy
+import numpy as np
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+import actionlib
+from std_msgs.msg import String
+from actionlib_msgs.msg import *
+
+class Navigation():
+
+    def __init__(self,data):
+        self.waypoints = data
+        self.sig = 's'
+        self.goal1 = MoveBaseGoal()
+        self.goal1.target_pose.header.frame_id = 'base_link'
+        self.goal1.target_pose.pose.orientation.z = 0.9 #3 meters
+        self.goal1.target_pose.pose.orientation.w = 1.0 #go forward
+        self.goal2 = MoveBaseGoal()
+        self.goal2.target_pose.header.frame_id = 'base_link'
+        self.goal2.target_pose.pose.orientation.z = -0.9 #3 meters
+        self.goal2.target_pose.pose.orientation.w = 1.0 #go forward
+
+
+    def startNav(self):
+        rospy.init_node('patrol')
+        self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self.client.wait_for_server()
+        rospy.Subscriber('keys', String, self.callback)
+
+        (x,y)  = self.waypoints.shape
+        i = 0
+        while True:
+            while i < x:
+
+                goal = self.goal_pose(self.waypoints[i])
+                self.client.send_goal(goal)
+                
+                
+                if self.sig == 'h':
+                    #self.client.cancel_goal()
+                    goal = self.goal_pose(self.waypoints[0])
+                    self.client.send_goal(goal)
+                    self.sig = 's'
+                elif self.sig == 'r':
+                    np.random.shuffle(self.waypoints)
+                    print(self.waypoints)
+                    self.sig = 's'
+
+                success = self.client.wait_for_result(rospy.Duration(60)) # let it try to get there in 1 minute 
+                state = self.client.get_state()
+
+                if success and state == GoalStatus.SUCCEEDED:
+                    self.client.send_goal(self.goal1)# shake to left and right
+                    self.client.wait_for_result(rospy.Duration(60))
+                    self.client.send_goal(self.goal2)
+                    self.client.wait_for_result(rospy.Duration(60))
+                    
+                else:
+                    self.client.cancel_goal()
+        
+                i = i + 1
+            i = 0               
+
+    def callback(self, data):
+        self.sig = data.data
+        print data.data
+
+    def goal_pose(self, pose):
+        goal_pose = MoveBaseGoal()
+        goal_pose.target_pose.header.frame_id = 'map'
+        goal_pose.target_pose.pose.position.x = pose[0]
+        goal_pose.target_pose.pose.position.y = pose[1]
+        goal_pose.target_pose.pose.position.z = pose[2]
+        goal_pose.target_pose.pose.orientation.x = pose[3]
+        goal_pose.target_pose.pose.orientation.y = pose[4]
+        goal_pose.target_pose.pose.orientation.z = pose[5]
+        goal_pose.target_pose.pose.orientation.w = pose[6]
+
+        return goal_pose
+
+
+if __name__ == '__main__':
+
+    waypoints = np.genfromtxt('/home/nenya/catkin_ws/src/exercise2/src/point.txt', dtype=float, delimiter=',') 
+    x = Navigation(waypoints)
+    x.startNav()
+    rospy.spin()
