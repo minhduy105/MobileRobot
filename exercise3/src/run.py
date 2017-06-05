@@ -45,7 +45,7 @@ class Navigation():
 
 if __name__ == '__main__':
 	rospy.init_node('nav_test', anonymous=False)
-	waypoints = np.genfromtxt('point.txt', dtype=float, delimiter=',')
+#	waypoints = np.genfromtxt('point.txt', dtype=float, delimiter=',')
 	waypoints = np.genfromtxt('goal.txt', dtype=float, delimiter=',') 
 	i = 0
 	(x,y)  = waypoints.shape
