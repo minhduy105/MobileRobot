@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import roslib
+import roslib; roslib.load_manifest('sound_play')
 import sys
 import rospy
 import cv2
@@ -10,6 +10,9 @@ import numpy as np
 import pyocr
 import message_filters
 import pyocr.builders
+import actionlib
+import subprocess
+
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
 from PIL import Image as Img
@@ -35,6 +38,7 @@ class image_converter:
 		self.langs = self.tool.get_available_languages()
 		self.lang = self.langs[0]
 		print("Will use lang '%s'" % (self.lang))
+
 		image_sub = rospy.Subscriber("/usb_cam/image_raw",Image,self.callbackImg)
 		key_sub = rospy.Subscriber('keys', String,self.callbackStr)
 
@@ -46,6 +50,10 @@ class image_converter:
 		)
 		return txt
 
+	def sayStuff(self,word):
+		cmd = ["rosrun sound_play say.py " + '"'+ word+'"']
+		subprocess.Popen(cmd,shell=True)
+	
 	def detectName(self,crop_img):
 		if self.start:
 			cv2_im = cv2.cvtColor(crop_img,cv2.COLOR_BGR2RGB)
@@ -58,10 +66,17 @@ class image_converter:
 			i = 0
 			
 			#assume the first name will be in the first 4 letter (Deliver to:, etc)
-			while i < len(liststr) or i < 4:
+			
+			while i < len(liststr) and i < 4:
 				if any(s.lower() == liststr[i].lower() for s in self.person):
 					print ("find person: ",liststr[i]) 
+					word = "deliver to " + liststr[i]
+					self.sayStuff(word)
+					# voice = " voice_rab_diphone"
+					# cmd = ["rosrun sound_play say.py " + '"'+ word+'"' + voice] 
+					
 					self.start = False
+
 					rate = rospy.Rate(10)
 					self.name_pub.publish(liststr[i])							
 					break
