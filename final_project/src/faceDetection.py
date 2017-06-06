@@ -17,11 +17,13 @@ from std_msgs.msg import String
 from PIL import Image as Img
 from cv_bridge import CvBridge, CvBridgeError
 
-class image_converter:
+
+class face_detection:
 
 	def __init__(self):
 
-		self.name_pub = rospy.Publisher("delivery_to",String,queue_size=10)
+#		self.name_pub = rospy.Publisher("delivery_to",String,queue_size=10)
+
 		self.bridge = CvBridge()
 		#this is for start searching "name" when the user hit s, and stop when it finds the name
 		self.start = False 
@@ -29,15 +31,6 @@ class image_converter:
 		self.person ={"Duy": 01,
 					"Alison": 02}
 		#set up the character recognition tool
-		self.tools = pyocr.get_available_tools()
-		if len(self.tools) == 0:
-			print("No OCR tool found")
-			sys.exit(1)
-		self.tool = self.tools[0]
-		self.langs = self.tool.get_available_languages()
-		self.lang = self.langs[0]
-		print("Will use lang '%s'" % (self.lang))
-
 		image_sub = rospy.Subscriber("/usb_cam/image_raw",Image,self.callbackImg)
 		key_sub = rospy.Subscriber('keys', String,self.callbackStr)
 
@@ -49,37 +42,33 @@ class image_converter:
 		)
 		return txt
 
+#new node 
 	def sayStuff(self,word):
 		cmd = ["rosrun sound_play say.py " + '"'+ word+'"']
 		subprocess.Popen(cmd,shell=True)
 	
-	def detectName(self,crop_img):
-		if self.start:
-			cv2_im = cv2.cvtColor(crop_img,cv2.COLOR_BGR2RGB)
-			pil_im = Img.fromarray(cv2_im)
-			txt = self.getletter(pil_im)
-			#delete all space
-			liststr = txt.split( )
-			#delete all special character
-			liststr = [''.join(e for e in x if e.isalnum()) if True else x for x in liststr ]
-			i = 0
+	def detectFace(self,img):
+		face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+		eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
+		
+		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		faces = face_cascade.detectMultiScale(gray,
+					scaleFactor=1.1,
+					minNeighbors=5,
+					minSize=(30, 30),
+					flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
+		print (faces)
+		for (x,y,w,h) in faces:
+			cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+			roi_gray = gray[y:y+h, x:x+w]
+			roi_color = img[y:y+h, x:x+w]
+			eyes = eye_cascade.detectMultiScale(roi_gray)
+			for (ex,ey,ew,eh) in eyes:
+				cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+		cv2.imshow('img',img)
+		cv2.imshow('gray',gray)
 			
-			#assume the first name will be in the first 4 letter (Deliver to:, etc)
-			
-			while i < len(liststr) and i < 4:
-				if any(s.lower() == liststr[i].lower() for s in self.person):
-					print ("find person: ",liststr[i]) 
-					word = "deliver to " + liststr[i]
-					self.sayStuff(word)
-					# voice = " voice_rab_diphone"
-					# cmd = ["rosrun sound_play say.py " + '"'+ word+'"' + voice] 
-					
-					self.start = False
-
-					rate = rospy.Rate(10)
-					self.name_pub.publish(liststr[i])							
-					break
-				i = i + 1
+		cv2.waitKey(3)
 
 	def callbackImg(self,image):
 		try:
@@ -87,11 +76,8 @@ class image_converter:
 		except CvBridgeError as e:
 			print(e)
 
-		crop_img = cv_image[80:320, 80:480] #crop image 
-		#need to make sure the image in this window before hit "s"
-		cv2.imshow("Image window", crop_img)
-		cv2.waitKey(3)
-		self.detectName(crop_img)
+		self.detectFace(cv_image)	
+
 
 	def callbackStr(self,keys):
 		word = keys.data
@@ -102,8 +88,8 @@ class image_converter:
 
 	
 if __name__ == '__main__':
-	rospy.init_node('read_name', anonymous=True)
-	ic = image_converter()
+	rospy.init_node('detect_face', anonymous=True)
+	ic = face_detection()
 
 	try:
 		rospy.spin()
@@ -112,3 +98,13 @@ if __name__ == '__main__':
 	cv2.destroyAllWindows()
 
 
+
+
+
+
+
+
+
+
+import numpy as np
+import cv2
