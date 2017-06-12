@@ -78,6 +78,8 @@ class image_converter:
 			liststr = [''.join(e for e in x if e.isalnum()) if True else x for x in liststr ]
 			i = 0
 			
+
+			print (liststr)
 			#assume the first name will be in the first 4 letter (Deliver to:, etc)
 			
 			while i < len(liststr) and i < 4:
@@ -88,7 +90,7 @@ class image_converter:
 					# voice = " voice_rab_diphone"
 					# cmd = ["rosrun sound_play say.py " + '"'+ word+'"' + voice] 
 					
-					self.start = False
+					self.start = False #stop looking for name
 
 					rate = rospy.Rate(10)
 					self.name_pub.publish(liststr[i])							
