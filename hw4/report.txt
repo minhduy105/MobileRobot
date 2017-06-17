@@ -1,0 +1,3 @@
+I think using the landmark will make the robot move close to the original point. However, as we introduce object that are not supposed to be in the map (in my case), the performance will mostly depending on how well the robot know how to organize itself.
+
+In my program, the last step of my program is to make the robot turn toward the landmark (new object) and organize itself based on that. However, if the robot can not turn to the landmark correctly, the whole adjustment will fail. Additionally, as I intruduce the new object to the map, the robot is easy to get confused and need to recallibrate itself multiple times as seen in the video clip.

@@ -39,12 +39,12 @@ class Scheduler():
 		key_sub = rospy.Subscriber('keys', String, self.keyCallback)
 
 	def setUpPointways(self):
-		pointA = [0.473, 1.870, 0.0, 0.0, 0.0, -0.653, 0.758]
-		pointB = [0.585, -0.885, 0.0, 0.0, 0.0, -0.653, 0.758]
+		pointA = [0.473, 1.870, 0.0, 0.0, 0.0, 0.730, 0.684]
+		pointB = [0.585, -0.885, 0.0, 0.0, 0.0, -0.661, 0.750]
 		self.waypoints = []
 		self.waypoints.append(pointA)
 		self.waypoints.append(pointB)
-		# self.waypoints.append(pointA)
+		self.waypoints.append(pointA)
 		self.waypoints_idx = 0
 
 	def setUpSpinning(self):
